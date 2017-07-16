@@ -241,17 +241,14 @@ public class CreateSampleDataOracle {
 			p = productlist.get(randy.nextInt(1000000));
 			
 			
-			o1 = new Orderline(o, p);
-			//if(!orderlinelist.contains(o1))
-			//	orderlinelist.add(o1);
+			o1 = new Orderline(i, o, p);
+			o1.setAmount(randy.nextFloat()+randy.nextInt(1000));
 			orderlinelist.add(o1);
-			//o1.setAmount(randy.nextFloat()+randy.nextInt(1000));
-
 		}
 		
-		for (Orderline ol : orderlinelist) {
-			ol.setAmount(randy.nextFloat()+randy.nextInt(1000));
-		}
+		//for (Orderline ol : orderlinelist) {
+		//	ol.setAmount(randy.nextFloat()+randy.nextInt(1000));
+		//}
 		
 		endtime = System.nanoTime();
 		System.out.println("Duration of fillOrderline (ms): "+(endtime-starttime)/1000000);
@@ -322,17 +319,18 @@ public class CreateSampleDataOracle {
 		Connection dbConnection = null;
 		PreparedStatement statement = null;
 		
-		String insertTableSQL = "INSERT INTO orderline (order_id, product_id, amount) "
-								+ "VALUES (?,?,?)";
+		String insertTableSQL = "INSERT INTO orderline (orderline_id, order_id, product_id, amount) "
+								+ "VALUES (?,?,?,?)";
 		try {
 			dbConnection = ConnectionHelperOracle.getDBConnection();
 			
 			for(Orderline o : orderlinelist) {
 				statement = dbConnection.prepareStatement(insertTableSQL);
 				
-				statement.setInt(1, o.getOrder().getOrder_id()); // the 1. ? from the PreparedStatement
-				statement.setInt(2, o.getProduct().getProduct_id()); // the 2. ? from the PreparedStatement
-				statement.setFloat(3, o.getAmount()); // the 3. ? from the PreparedStatement
+				statement.setInt(1, o.getOrderline_id()); // the 1. ? from the PreparedStatement
+				statement.setInt(2, o.getOrder().getOrder_id()); // the 2. ? from the PreparedStatement
+				statement.setInt(3, o.getProduct().getProduct_id()); // the 3. ? from the PreparedStatement
+				statement.setFloat(4, o.getAmount()); // the 4. ? from the PreparedStatement
 
 				// execute insert SQL statement
 				statement.executeUpdate();

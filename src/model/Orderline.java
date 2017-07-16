@@ -2,12 +2,14 @@ package model;
 
 public class Orderline {
 	
+	private int orderline_id;
 	private Orders order;
 	private Product product;
 	private float amount;
 	
-	public Orderline(Orders order, Product product, float amount) {
+	public Orderline(int orderline_id, Orders order, Product product, float amount) {
 		super();
+		this.orderline_id = orderline_id;
 		this.order = order;
 		this.product = product;
 		this.amount = amount;
@@ -15,10 +17,24 @@ public class Orderline {
 	
 	
 
-	public Orderline(Orders order, Product product) {
+	public Orderline(int orderline_id, Orders order, Product product) {
 		super();
+		this.orderline_id = orderline_id;
 		this.order = order;
 		this.product = product;
+	}
+
+
+	
+
+	public int getOrderline_id() {
+		return orderline_id;
+	}
+
+
+
+	public void setOrderline_id(int orderline_id) {
+		this.orderline_id = orderline_id;
 	}
 
 

@@ -63,10 +63,11 @@ CONSTRAINT fk_orders_user
 );
 
 create table orderline (
+    orderline_id number(10) PRIMARY KEY,
     order_id number(10),
     product_id number(10),
     amount number(15,5),
-CONSTRAINT pk_orderline PRIMARY KEY (order_id, product_id),
+--CONSTRAINT pk_orderline PRIMARY KEY (order_id, product_id),
 CONSTRAINT fk_orderline_orders
     FOREIGN KEY (order_id)
     REFERENCES orders (order_id),
