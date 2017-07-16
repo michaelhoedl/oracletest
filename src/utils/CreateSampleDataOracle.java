@@ -93,7 +93,7 @@ public class CreateSampleDataOracle {
 			}
 			else if (i%13 == 0) {
 				country = "Italy";
-			}
+			} 
 			else if (i%7 == 0) {
 				country = "France";
 			}
