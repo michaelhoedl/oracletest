@@ -2,31 +2,41 @@ package model;
 
 public class Orderline {
 	
-	private int order_id;
-	private int product_id;
+	private Orders order;
+	private Product product;
 	private float amount;
 	
-	public Orderline(int order_id, int product_id, float amount) {
+	public Orderline(Orders order, Product product, float amount) {
 		super();
-		this.order_id = order_id;
-		this.product_id = product_id;
+		this.order = order;
+		this.product = product;
 		this.amount = amount;
 	}
+	
+	
 
-	public int getOrder_id() {
-		return order_id;
+	public Orderline(Orders order, Product product) {
+		super();
+		this.order = order;
+		this.product = product;
 	}
 
-	public void setOrder_id(int order_id) {
-		this.order_id = order_id;
+
+
+	public Orders getOrder() {
+		return order;
 	}
 
-	public int getProduct_id() {
-		return product_id;
+	public void setOrder(Orders order) {
+		this.order = order;
 	}
 
-	public void setProduct_id(int product_id) {
-		this.product_id = product_id;
+	public Product getProduct() {
+		return product;
+	}
+
+	public void setProduct(Product product) {
+		this.product = product;
 	}
 
 	public float getAmount() {
@@ -36,6 +46,12 @@ public class Orderline {
 	public void setAmount(float amount) {
 		this.amount = amount;
 	}
+
+	@Override
+	public String toString() {
+		return "Orderline [order=" + order + ", product=" + product + ", amount=" + amount + "]";
+	}
+	
 	
 	
 

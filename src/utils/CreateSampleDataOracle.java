@@ -9,9 +9,14 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.HashSet;
 import java.util.Random;
+import java.util.Set;
 
 import model.Creditcard;
+import model.Orderline;
+import model.Orders;
 import model.Person;
 import model.Product;
 import model.Shopuser;
@@ -24,6 +29,8 @@ public class CreateSampleDataOracle {
 	private ArrayList<Person> personlist = new ArrayList<Person>();
 	private ArrayList<Product> productlist = new ArrayList<Product>();
 	private ArrayList<Shopuser> shopuserlist = new ArrayList<Shopuser>();
+	private ArrayList<Orders> orderlist = new ArrayList<Orders>();
+	private HashSet<Orderline> orderlinelist = new HashSet<Orderline>();
 
 	
 	public static void main(String[] argv) {
@@ -33,6 +40,10 @@ public class CreateSampleDataOracle {
 		csdo.fillPersons();
 		csdo.fillProducts();
 		csdo.fillShopusers();
+		csdo.fillOrders();
+		csdo.fillOrderline();
+		
+		System.out.println("size="+csdo.orderlinelist.size());
 		
 		
 		
@@ -40,7 +51,9 @@ public class CreateSampleDataOracle {
 			//csdo.writeCreditcardsToOracle();
 			//csdo.writePersonsToOracle();
 			//csdo.writeProductsToOracle();
-			csdo.writeShopusersToOracle();
+			//csdo.writeShopusersToOracle();
+			//csdo.writeOrdersToOracle();
+			csdo.writeOrderlinesToOracle();
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -174,6 +187,77 @@ public class CreateSampleDataOracle {
 	}
 	
 	
+	/**
+	 * Fill the ArrayList with 100000 sample Order Objects
+	 */
+	private void fillOrders() {
+		long starttime;
+		long endtime;
+		starttime = System.nanoTime();
+		
+		Random randy = new Random();
+
+		Shopuser user;
+		Orders o1;
+		for(int i = 1; i <= 100000; i++) {
+			
+			// generate a random date
+			Calendar calendar = Calendar.getInstance();
+			calendar.set(Calendar.YEAR, randy.nextInt(17)+2000);
+			calendar.set(Calendar.DAY_OF_YEAR, randy.nextInt(365));
+			java.util.Date d = calendar.getTime();
+			
+			// get a random user from the user list
+			user = shopuserlist.get(randy.nextInt(10000));
+			
+			o1 = new Orders(i, d, user);
+			orderlist.add(o1);
+		}
+		
+		
+		endtime = System.nanoTime();
+		System.out.println("Duration of fillOrders (ms): "+(endtime-starttime)/1000000);
+		
+	}
+	
+
+	/**
+	 * Fill the ArrayList with 5000000 sample Orderline Objects
+	 */
+	private void fillOrderline() {
+		long starttime;
+		long endtime;
+		starttime = System.nanoTime();
+		
+		Random randy = new Random();
+
+		Product p;
+		Orders o;
+		
+		Orderline o1;
+		
+		for(int i = 1; i <= 5000000; i++) {
+			o = orderlist.get(randy.nextInt(100000));
+			p = productlist.get(randy.nextInt(1000000));
+			
+			
+			o1 = new Orderline(o, p);
+			//if(!orderlinelist.contains(o1))
+			//	orderlinelist.add(o1);
+			orderlinelist.add(o1);
+			//o1.setAmount(randy.nextFloat()+randy.nextInt(1000));
+
+		}
+		
+		for (Orderline ol : orderlinelist) {
+			ol.setAmount(randy.nextFloat()+randy.nextInt(1000));
+		}
+		
+		endtime = System.nanoTime();
+		System.out.println("Duration of fillOrderline (ms): "+(endtime-starttime)/1000000);
+		
+	}
+	
 	
 	// ---------------------------------------------------------------------------
 	
@@ -225,7 +309,105 @@ public class CreateSampleDataOracle {
 		
 	}
 	
+	
 
+	/**
+	 * Insert the Orderlines from the ArrayList into the Oracle DB
+	 */
+	private void writeOrderlinesToOracle() throws SQLException {
+		long starttime;
+		long endtime;
+		starttime = System.nanoTime();
+		
+		Connection dbConnection = null;
+		PreparedStatement statement = null;
+		
+		String insertTableSQL = "INSERT INTO orderline (order_id, product_id, amount) "
+								+ "VALUES (?,?,?)";
+		try {
+			dbConnection = ConnectionHelperOracle.getDBConnection();
+			
+			for(Orderline o : orderlinelist) {
+				statement = dbConnection.prepareStatement(insertTableSQL);
+				
+				statement.setInt(1, o.getOrder().getOrder_id()); // the 1. ? from the PreparedStatement
+				statement.setInt(2, o.getProduct().getProduct_id()); // the 2. ? from the PreparedStatement
+				statement.setFloat(3, o.getAmount()); // the 3. ? from the PreparedStatement
+
+				// execute insert SQL statement
+				statement.executeUpdate();
+				
+				statement.close();
+			} 
+		
+			System.out.println("Records are inserted into ORDERLINE table!");
+
+		} catch (SQLException e) {
+			System.out.println(e.getMessage());
+		} finally {
+			if (statement != null) {
+				statement.close();
+			}
+			if (dbConnection != null) {
+				dbConnection.close();
+			}
+		}
+		
+		endtime = System.nanoTime();
+		System.out.println("Duration of writeOrderlinesToOracle (ms): "+(endtime-starttime)/1000000);
+		
+	}
+
+
+	/**
+	 * Insert the Orders from the ArrayList into the Oracle DB
+	 */
+	private void writeOrdersToOracle() throws SQLException {
+		long starttime;
+		long endtime;
+		starttime = System.nanoTime();
+		
+		Connection dbConnection = null;
+		PreparedStatement statement = null;
+		
+		String insertTableSQL = "INSERT INTO orders (order_id, order_date, username) "
+								+ "VALUES (?,?,?)";
+		try {
+			dbConnection = ConnectionHelperOracle.getDBConnection();
+			
+			for(Orders o : orderlist) {
+				statement = dbConnection.prepareStatement(insertTableSQL);
+				
+				statement.setInt(1, o.getOrder_id()); // the 1. ? from the PreparedStatement
+				statement.setDate(2, (new java.sql.Date(o.getOrder_date().getTime())) ); // the 2. ? from the PreparedStatement
+				statement.setString(3, o.getUser().getUsername()); // the 3. ? from the PreparedStatement
+
+				// execute insert SQL statement
+				statement.executeUpdate();
+				
+				statement.close();
+			} 
+		
+			System.out.println("Records are inserted into ORDERS table!");
+
+		} catch (SQLException e) {
+			System.out.println(e.getMessage());
+		} finally {
+			if (statement != null) {
+				statement.close();
+			}
+			if (dbConnection != null) {
+				dbConnection.close();
+			}
+		}
+		
+		endtime = System.nanoTime();
+		System.out.println("Duration of writeOrdersToOracle (ms): "+(endtime-starttime)/1000000);
+		
+	}
+
+	
+	
 	/**
 	 * Insert the Shopusers from the ArrayList into the Oracle DB
 	 */
