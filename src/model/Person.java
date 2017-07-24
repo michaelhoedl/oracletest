@@ -1,5 +1,6 @@
 package model;
 
+import java.util.ArrayList;
 import java.util.Date;
 
 public class Person {
@@ -109,6 +110,12 @@ public class Person {
 	public void setCreditcard_id(Creditcard creditcard) {
 		this.creditcard = creditcard;
 	}
+
+	public void setCreditcard(Creditcard creditcard) {
+		this.creditcard = creditcard;
+	}
+	
+	
 	
 	
 	

@@ -46,13 +46,12 @@ public class CreateSampleDataOracle {
 		System.out.println("size="+csdo.orderlinelist.size());
 		
 		
-		
 		try {
-			//csdo.writeCreditcardsToOracle();
-			//csdo.writePersonsToOracle();
-			//csdo.writeProductsToOracle();
-			//csdo.writeShopusersToOracle();
-			//csdo.writeOrdersToOracle();
+			csdo.writeCreditcardsToOracle();
+			csdo.writePersonsToOracle();
+			csdo.writeProductsToOracle();
+			csdo.writeShopusersToOracle();
+			csdo.writeOrdersToOracle();
 			csdo.writeOrderlinesToOracle();
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
@@ -131,12 +130,27 @@ public class CreateSampleDataOracle {
 		Product p1;
 		for (int i = 1; i <= 1000000; i++) {
 			p1 = new Product(i, "Product"+i, "The best Product!", randy.nextFloat()*randy.nextInt(1000), randy.nextFloat()*randy.nextInt(500));
+			fillProducts2Categories(p1);
 			productlist.add(p1);
 		}
 		endtime = System.nanoTime();
 		System.out.println("Duration of fillProducts (ms): "+(endtime-starttime)/1000000);
-		
 	}
+	
+	
+	/**
+	 * Fill some sample Categories into the Products
+	 */
+	private void fillProducts2Categories(Product p) {
+		Random randy = new Random();
+		HashSet<String> cats = new HashSet<String>();
+		//set up to 10 categories for the product
+		for(int j = 1; j <= randy.nextInt(9)+1; j++) {
+			cats.add("category"+j);
+		}
+		p.setCategories(cats);	
+	}
+
 	
 	/**
 	 * Fill the ArrayList with 10000 sample Shopuser Objects
@@ -530,9 +544,15 @@ public class CreateSampleDataOracle {
 		
 		Connection dbConnection = null;
 		PreparedStatement statement = null;
+		PreparedStatement statement2 = null;
+
 		
 		String insertTableSQL = "INSERT INTO product (product_id, product_name, product_description, price, in_stock) "
 								+ "VALUES (?,?,?,?,?)";
+		
+		String insertTableSQL2 = "INSERT INTO product2categories (product_id, categoryname) "
+				+ "VALUES (?,?)";
+		
 		try {
 			dbConnection = ConnectionHelperOracle.getDBConnection();
 			
@@ -548,10 +568,21 @@ public class CreateSampleDataOracle {
 				// execute insert SQL statement
 				statement.executeUpdate();
 				
+				// insert the categories
+				for(String s : p.getCategories()) {
+					statement2 = dbConnection.prepareStatement(insertTableSQL2);
+					statement2.setInt(1, p.getProduct_id()); // the 1. ? from the PreparedStatement
+					statement2.setString(2, s); // the 2. ? from the PreparedStatement
+					statement2.executeUpdate();
+					statement2.close();
+				}
+				
 				statement.close();
 			} 
 		
 			System.out.println("Records are inserted into PRODUCT table!");
+			System.out.println("Records are also inserted into PRODUCT2CATEGORIES table!");
+
 
 		} catch (SQLException e) {
 			System.out.println(e.getMessage());

@@ -5,6 +5,7 @@ drop table shopuser cascade constraints;
 drop table person cascade constraints;
 drop table product cascade constraints;
 drop table creditcard cascade constraints;
+drop table product2category cascade constraints;
 
 
 create table creditcard (
@@ -22,6 +23,13 @@ create table product (
     in_stock number(15,5)
 );
 
+create table product2category (
+    product_id number(10) PRIMARY KEY,
+    categoryname varchar2(500) not null,
+CONSTRAINT fk_product2category_product
+    FOREIGN KEY (product_id)
+    REFERENCES product (product_id)
+);
 
 create table person (
     person_id   number(10) PRIMARY KEY,
@@ -51,8 +59,6 @@ CONSTRAINT fk_shopuser_person
     REFERENCES person (person_id)
 );
 
-
-
 create table orders (
     order_id number(10) PRIMARY KEY,
     order_date date,
@@ -75,4 +81,3 @@ CONSTRAINT fk_orderline_product
     FOREIGN KEY (product_id)
     REFERENCES product (product_id)
 );
-
