@@ -550,7 +550,7 @@ public class CreateSampleDataOracle {
 		String insertTableSQL = "INSERT INTO product (product_id, product_name, product_description, price, in_stock) "
 								+ "VALUES (?,?,?,?,?)";
 		
-		String insertTableSQL2 = "INSERT INTO product2categories (product_id, categoryname) "
+		String insertTableSQL2 = "INSERT INTO product2category (product_id, categoryname) "
 				+ "VALUES (?,?)";
 		
 		try {

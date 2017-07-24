@@ -24,7 +24,7 @@ create table product (
 );
 
 create table product2category (
-    product_id number(10) PRIMARY KEY,
+    product_id number(10) not null,
     categoryname varchar2(500) not null,
 CONSTRAINT fk_product2category_product
     FOREIGN KEY (product_id)
