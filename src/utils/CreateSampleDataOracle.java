@@ -236,7 +236,7 @@ public class CreateSampleDataOracle {
 	
 
 	/**
-	 * Fill the ArrayList with 5000000 sample Orderline Objects
+	 * Fill the HashSet with 5000000 sample Orderline Objects
 	 */
 	private void fillOrderline() {
 		long starttime;
@@ -260,13 +260,8 @@ public class CreateSampleDataOracle {
 			orderlinelist.add(o1);
 		}
 		
-		//for (Orderline ol : orderlinelist) {
-		//	ol.setAmount(randy.nextFloat()+randy.nextInt(1000));
-		//}
-		
 		endtime = System.nanoTime();
 		System.out.println("Duration of fillOrderline (ms): "+(endtime-starttime)/1000000);
-		
 	}
 	
 	
