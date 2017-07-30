@@ -36,6 +36,7 @@ public class CreateSampleDataOracle {
 	public static void main(String[] argv) {
 		CreateSampleDataOracle csdo = new CreateSampleDataOracle();
 		
+		
 		csdo.fillCreditCards();
 		csdo.fillPersons();
 		csdo.fillProducts();
@@ -43,16 +44,20 @@ public class CreateSampleDataOracle {
 		csdo.fillOrders();
 		csdo.fillOrderline();
 		
+		
 		System.out.println("size="+csdo.orderlinelist.size());
 		
 		
 		try {
-			csdo.writeCreditcardsToOracle();
+			/*csdo.writeCreditcardsToOracle();
 			csdo.writePersonsToOracle();
 			csdo.writeProductsToOracle();
 			csdo.writeShopusersToOracle();
 			csdo.writeOrdersToOracle();
+			*/
 			csdo.writeOrderlinesToOracle();
+			
+			//csdo.writeOrderlinesToOracle2();
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -596,4 +601,75 @@ public class CreateSampleDataOracle {
 	}
 	
 
+	
+	
+	
+	//---------
+	
+
+	/**
+	 * Insert the Orderlines from the ArrayList into the Oracle DB
+	 */
+	private void writeOrderlinesToOracle2() throws SQLException {
+		long starttime;
+		long endtime;
+		starttime = System.nanoTime();
+		
+		Connection dbConnection = null;
+		PreparedStatement statement = null;
+		
+		String insertTableSQL = "INSERT INTO orderline2 (orderline_id, order_id, product_id, amount) "
+								+ "VALUES (?,?,?,?)";
+		try {
+			dbConnection = ConnectionHelperOracle.getDBConnection();
+			
+			for(int i = 0; i < 5000000; i++) {
+				statement = dbConnection.prepareStatement(insertTableSQL);
+								
+				statement.setInt(1, i); // the 1. ? from the PreparedStatement
+				statement.setInt(2, i); // the 2. ? from the PreparedStatement
+				statement.setInt(3, i); // the 3. ? from the PreparedStatement
+				statement.setFloat(4, i); // the 4. ? from the PreparedStatement
+
+				// execute insert SQL statement
+				//statement.executeUpdate();
+				statement.addBatch();
+				
+				//statement.close();
+				
+				
+				if(i%100 == 0) {
+					statement.executeBatch();
+					statement.clearBatch();
+					//dbConnection.commit();
+				}	
+				
+			} 
+			
+			statement.executeBatch();
+			dbConnection.commit();
+			statement.close();
+		
+			System.out.println("Records are inserted into ORDERLINE2 table!");
+
+		} catch (SQLException e) {
+			System.out.println(e.getMessage());
+		} finally {
+			if (statement != null) {
+				statement.close();
+			}
+			if (dbConnection != null) {
+				dbConnection.close();
+			}
+		}
+		
+		endtime = System.nanoTime();
+		System.out.println("Duration of writeOrderlinesToOracle2 (ms): "+(endtime-starttime)/1000000);
+		
+	}
+
+	
+	
 }
+
+
